@@ -95,16 +95,16 @@ public class DataXmlExporter {
 	}
 
 	class XmlBuilder {
-		private static final String OPEN_XML_STANZA = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+		private static final String OPEN_XML_STANZA = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 		private static final String CLOSE_WITH_TICK = "'>";
 		private static final String DB_OPEN = "<database name='";
 		private static final String DB_CLOSE = "</database>";
-		private static final String TABLE_OPEN = "<table name='";
-		private static final String TABLE_CLOSE = "</table>";
-		private static final String ROW_OPEN = "<row>";
-		private static final String ROW_CLOSE = "</row>";
+		private static final String TABLE_OPEN = "\n<table name='";
+		private static final String TABLE_CLOSE = "</table>\n";
+		private static final String ROW_OPEN = "<row>\n";
+		private static final String ROW_CLOSE = "</row>\n";
 		private static final String COL_OPEN = "<col name='";
-		private static final String COL_CLOSE = "</col>";
+		private static final String COL_CLOSE = "</col>\n";
 
 		private final StringBuilder sb;
 
