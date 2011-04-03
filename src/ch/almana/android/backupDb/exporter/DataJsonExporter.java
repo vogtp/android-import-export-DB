@@ -6,11 +6,13 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.text.TextUtils;
 import android.util.Log;
 
 public class DataJsonExporter extends DataExporter {
@@ -38,20 +40,18 @@ public class DataJsonExporter extends DataExporter {
 		String sql = "select * from sqlite_master";
 		Cursor c = this.db.rawQuery(sql, new String[0]);
 		Log.d(LOG_TAG, "select * from sqlite_master, cur size " + c.getCount());
-		if (c.moveToFirst()) {
-			do {
-				String tableName = c.getString(c.getColumnIndex("name"));
-				Log.d(LOG_TAG, "table name " + tableName);
+		while (c.moveToNext()) {
+			String tableName = c.getString(c.getColumnIndex("name"));
+			Log.d(LOG_TAG, "table name " + tableName);
 
-				// skip metadata, sequence, and uidx (unique indexes)
-				if (!tableName.equals("android_metadata") && !tableName.equals("sqlite_sequence") && !tableName.startsWith("uidx") && !tableName.startsWith("idx_")) {
-					try {
-						this.exportTable(tableName);
-					} catch (SQLiteException e) {
-						Log.w(LOG_TAG, "Error exporting table " + tableName, e);
-					}
+			// skip metadata, sequence, and uidx (unique indexes)
+			if (!tableName.equals("android_metadata") && !tableName.equals("sqlite_sequence") && !tableName.startsWith("uidx") && !tableName.startsWith("idx_")) {
+				try {
+					this.exportTable(tableName);
+				} catch (SQLiteException e) {
+					Log.w(LOG_TAG, "Error exporting table " + tableName, e);
 				}
-			} while (c.moveToNext());
+			}
 		}
 		c.close();
 		this.writeToFile(jsonRoot.toString(1), dbName + ".json");
@@ -60,17 +60,20 @@ public class DataJsonExporter extends DataExporter {
 
 	private void exportTable(final String tableName) throws Exception {
 		Log.d(LOG_TAG, "exporting table - " + tableName);
-		JSONObject table = new JSONObject();
 
 		String sql = "select * from " + tableName;
 		Cursor c = this.db.rawQuery(sql, new String[0]);
+		JSONArray table = new JSONArray();
 		while (c.moveToNext()) {
 			JSONObject row = new JSONObject();
-			String id = c.getString(0);
+			String id = c.getString(1);
+			if (id == null || TextUtils.isEmpty(id)) {
+				id = c.getString(0);
+			}
 			for (int i = 0; i < c.getColumnCount(); i++) {
 				row.put(c.getColumnName(i), c.getString(i));
 			}
-			table.put(id, row);
+			table.put(row);
 		}
 		c.close();
 		jsonDB.put(tableName, table);
