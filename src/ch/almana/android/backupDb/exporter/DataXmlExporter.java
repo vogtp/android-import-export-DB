@@ -1,4 +1,4 @@
-package ch.almana.android.backupDb2Xml;
+package ch.almana.android.backupDb.exporter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
-public class DataXmlExporter {
+public class DataXmlExporter extends DataExporter {
 
 	public static final String LOG_TAG = "Db2XmlExporter";
 
