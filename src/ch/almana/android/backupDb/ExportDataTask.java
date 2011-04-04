@@ -1,7 +1,7 @@
 package ch.almana.android.backupDb;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -10,9 +10,9 @@ import ch.almana.android.backupDb.exporter.DataExporter;
 import ch.almana.android.backupDb.exporter.DataJsonExporter;
 import ch.almana.android.backupDb.exporter.DataXmlExporter;
 
-public class ExportDataAsXmlTask extends AsyncTask<String, Void, String> {
+public class ExportDataTask extends AsyncTask<String, Void, String> {
 
-	private final Activity activity;
+	private final Context ctx;
 	private final ProgressDialog dialog;
 	private final String directory;
 	private SQLiteDatabase db;
@@ -23,26 +23,26 @@ public class ExportDataAsXmlTask extends AsyncTask<String, Void, String> {
 	}
 
 	// hide
-	private ExportDataAsXmlTask() {
+	private ExportDataTask() {
 		super();
-		this.activity = null;
+		this.ctx = null;
 		this.directory = null;
 		this.dialog = null;
 	}
 
-	public ExportDataAsXmlTask(Activity activity, SQLiteDatabase db, String saveDirectory, ExportType exportType) {
+	public ExportDataTask(Context ctx, SQLiteDatabase db, String saveDirectory, ExportType exportType) {
 		super();
-		this.activity = activity;
+		this.ctx = ctx;
 		this.db = db;
 		this.directory = saveDirectory;
-		this.dialog = new ProgressDialog(activity);
+		this.dialog = new ProgressDialog(ctx);
 		this.exportType = exportType;
 	}
 
 	// can use UI thread here
 	@Override
 	protected void onPreExecute() {
-		this.getDialog().setMessage("Exporting database as XML...");
+		this.getDialog().setMessage("Exporting database...");
 		this.getDialog().show();
 	}
 
@@ -82,9 +82,9 @@ public class ExportDataAsXmlTask extends AsyncTask<String, Void, String> {
 			this.getDialog().dismiss();
 		}
 		if (errMsg == null) {
-			Toast.makeText(activity, "Export successful!", Toast.LENGTH_SHORT).show();
+			Toast.makeText(ctx, "Export successful!", Toast.LENGTH_SHORT).show();
 		} else {
-			Toast.makeText(activity, "Export failed - " + errMsg, Toast.LENGTH_SHORT).show();
+			Toast.makeText(ctx, "Export failed - " + errMsg, Toast.LENGTH_SHORT).show();
 		}
 	}
 
