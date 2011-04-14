@@ -77,7 +77,9 @@ public abstract class DataExporter {
 			directory.mkdirs();
 		}
 		File file = new File(directory, exportFileName);
-		file.createNewFile();
+		if (file.exists()) {
+			file.delete();
+		}
 
 		ByteBuffer buff = ByteBuffer.wrap(payload.getBytes());
 		FileChannel channel = new FileOutputStream(file).getChannel();
