@@ -1,5 +1,7 @@
 package ch.almana.android.backupDb;
 
+import java.io.File;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -14,7 +16,7 @@ public class ExportDataTask extends AsyncTask<String, Void, String> {
 
 	private final Context ctx;
 	private final ProgressDialog dialog;
-	private final String directory;
+	private final File directory;
 	private SQLiteDatabase db;
 	private ExportType exportType;
 	
@@ -30,7 +32,7 @@ public class ExportDataTask extends AsyncTask<String, Void, String> {
 		this.dialog = null;
 	}
 
-	public ExportDataTask(Context ctx, SQLiteDatabase db, String saveDirectory, ExportType exportType) {
+	public ExportDataTask(Context ctx, SQLiteDatabase db, File saveDirectory, ExportType exportType) {
 		super();
 		this.ctx = ctx;
 		this.db = db;

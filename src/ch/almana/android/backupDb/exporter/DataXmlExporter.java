@@ -1,5 +1,6 @@
 package ch.almana.android.backupDb.exporter;
 
+import java.io.File;
 import java.io.IOException;
 
 import android.database.Cursor;
@@ -10,7 +11,7 @@ public class DataXmlExporter extends DataExporter {
 
 	private XmlBuilder xmlBuilder;
 
-	public DataXmlExporter(SQLiteDatabase db, String directory) {
+	public DataXmlExporter(SQLiteDatabase db, File directory) {
 		super(db, directory);
 	}
 

@@ -17,9 +17,9 @@ public abstract class DataExporter {
 	public static final String LOG_TAG = "DataExporter";
 
 	protected final SQLiteDatabase db;
-	protected final String directory;
+	protected final File directory;
 
-	public DataExporter(SQLiteDatabase db, String directory) {
+	public DataExporter(SQLiteDatabase db, File directory) {
 		this.db = db;
 		this.directory = directory;
 	}
@@ -73,11 +73,10 @@ public abstract class DataExporter {
 	}
 
 	private void writeToFile(String payload, String exportFileName) throws IOException {
-		File dir = new File(directory);
-		if (!dir.exists()) {
-			dir.mkdirs();
+		if (!directory.exists()) {
+			directory.mkdirs();
 		}
-		File file = new File(dir, exportFileName);
+		File file = new File(directory, exportFileName);
 		file.createNewFile();
 
 		ByteBuffer buff = ByteBuffer.wrap(payload.getBytes());

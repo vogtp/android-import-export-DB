@@ -1,5 +1,7 @@
 package ch.almana.android.backupDb.exporter;
 
+import java.io.File;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -13,7 +15,7 @@ public class DataJsonExporter extends DataExporter {
 	private JSONArray table;
 
 
-	public DataJsonExporter(SQLiteDatabase db, String directory) {
+	public DataJsonExporter(SQLiteDatabase db, File directory) {
 		super(db, directory);
 		jsonRoot = new JSONObject();
 	}
