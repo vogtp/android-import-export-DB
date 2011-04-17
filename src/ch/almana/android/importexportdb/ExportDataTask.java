@@ -1,4 +1,4 @@
-package ch.almana.android.backupDb;
+package ch.almana.android.importexportdb;
 
 import java.io.File;
 
@@ -8,9 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
-import ch.almana.android.backupDb.exporter.DataExporter;
-import ch.almana.android.backupDb.exporter.DataJsonExporter;
-import ch.almana.android.backupDb.exporter.DataXmlExporter;
+import ch.almana.android.importexportdb.exporter.DataExporter;
+import ch.almana.android.importexportdb.exporter.DataJsonExporter;
+import ch.almana.android.importexportdb.exporter.DataXmlExporter;
 
 public class ExportDataTask extends AsyncTask<String, Void, String> {
 

@@ -1,11 +1,9 @@
-package ch.almana.android.backupDb.exporter;
+package ch.almana.android.importexportdb.exporter;
 
 import java.io.File;
 import java.io.IOException;
 
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 public class DataXmlExporter extends DataExporter {
 
@@ -13,22 +11,6 @@ public class DataXmlExporter extends DataExporter {
 
 	public DataXmlExporter(SQLiteDatabase db, File directory) {
 		super(db, directory);
-	}
-
-	private void exportTable(final String tableName) throws IOException {
-		Log.d(LOG_TAG, "exporting table - " + tableName);
-
-		String sql = "select * from " + tableName;
-		Cursor c = this.db.rawQuery(sql, new String[0]);
-		if (c.moveToFirst()) {
-			int cols = c.getColumnCount();
-			do {
-				for (int i = 0; i < cols; i++) {
-				}
-			} while (c.moveToNext());
-		}
-		c.close();
-
 	}
 
 	class XmlBuilder {

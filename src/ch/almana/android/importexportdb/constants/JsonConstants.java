@@ -1,4 +1,4 @@
-package ch.almana.android.backupDb.constants;
+package ch.almana.android.importexportdb.constants;
 
 public class JsonConstants {
 

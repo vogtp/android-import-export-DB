@@ -1,4 +1,4 @@
-package ch.almana.android.backupDb.importer;
+package ch.almana.android.importexportdb.importer;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,7 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
-import ch.almana.android.backupDb.constants.JsonConstants;
+import ch.almana.android.importexportdb.constants.JsonConstants;
 
 public class DataJsonImporter {
 

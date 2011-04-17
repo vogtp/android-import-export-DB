@@ -1,4 +1,4 @@
-package ch.almana.android.backupDb.exporter;
+package ch.almana.android.importexportdb.exporter;
 
 import java.io.File;
 

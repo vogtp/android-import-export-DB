@@ -1,4 +1,4 @@
-package ch.almana.android.backupDb.exporter;
+package ch.almana.android.importexportdb.exporter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.text.TextUtils;
 import android.util.Log;
-import ch.almana.android.backupDb.constants.JsonConstants;
+import ch.almana.android.importexportdb.constants.JsonConstants;
 
 public abstract class DataExporter {
 
