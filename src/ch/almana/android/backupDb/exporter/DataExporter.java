@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.text.TextUtils;
 import android.util.Log;
+import ch.almana.android.backupDb.constants.JsonConstants;
 
 public abstract class DataExporter {
 
@@ -47,7 +48,7 @@ public abstract class DataExporter {
 			}
 		}
 		c.close();
-		this.writeToFile(getExportAsString(), dbName + ".json");
+		this.writeToFile(getExportAsString(), dbName + JsonConstants.FILE_NAME);
 		Log.i(LOG_TAG, "exporting database complete");
 	}
 
