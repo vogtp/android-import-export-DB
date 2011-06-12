@@ -12,19 +12,22 @@ import ch.almana.android.importexportdb.exporter.DataExporter;
 import ch.almana.android.importexportdb.exporter.DataJsonExporter;
 import ch.almana.android.importexportdb.exporter.DataXmlExporter;
 
-public class ExportDataTask extends AsyncTask<String, Void, String> {
+public class ExportDataTask extends AsyncTask<String, Void, Boolean> {
 
 	private final Context ctx;
 	private final ProgressDialog dialog;
 	private final File directory;
 	private SQLiteDatabase db;
 	private ExportType exportType;
-	
+	private Object errMsg;
+	private BackupRestoreCallback cb;
+
 	public enum ExportType {
 		JSON, XML;
 	}
 
 	// hide
+	@SuppressWarnings("unused")
 	private ExportDataTask() {
 		super();
 		this.ctx = null;
@@ -32,25 +35,32 @@ public class ExportDataTask extends AsyncTask<String, Void, String> {
 		this.dialog = null;
 	}
 
-	public ExportDataTask(Context ctx, SQLiteDatabase db, File saveDirectory, ExportType exportType) {
+	public ExportDataTask(BackupRestoreCallback cb, SQLiteDatabase db, File saveDirectory, ExportType exportType) {
 		super();
-		this.ctx = ctx;
+		this.cb = cb;
+		this.ctx = cb.getContext();
 		this.db = db;
 		this.directory = saveDirectory;
-		this.dialog = new ProgressDialog(ctx);
+		if (ctx == ctx.getApplicationContext()) {
+			this.dialog = null;
+		} else {
+			this.dialog = new ProgressDialog(ctx);
+		}
 		this.exportType = exportType;
 	}
 
 	// can use UI thread here
 	@Override
 	protected void onPreExecute() {
-		this.getDialog().setMessage("Exporting database...");
-		this.getDialog().show();
+		if (dialog != null) {
+			this.dialog.setMessage("Exporting database...");
+			this.dialog.show();
+		}
 	}
 
 	// automatically done on worker thread (separate from UI thread)
 	@Override
-	protected String doInBackground(final String... args) {
+	protected Boolean doInBackground(final String... args) {
 		DataExporter dm;
 		switch (exportType) {
 		case JSON:
@@ -71,22 +81,26 @@ public class ExportDataTask extends AsyncTask<String, Void, String> {
 				dm.export(dbName);
 			} catch (Exception e) {
 				Log.e(DataXmlExporter.LOG_TAG, e.getMessage(), e);
-				return e.getMessage();
+				errMsg = e.getMessage();
+				return false;
 			}
 		}
-		return null;
+		return true;
 	}
 
 	// can use UI thread here
 	@Override
-	protected void onPostExecute(final String errMsg) {
-		if (this.getDialog().isShowing()) {
-			this.getDialog().dismiss();
-		}
-		if (errMsg == null) {
-			Toast.makeText(ctx, "Export successful!", Toast.LENGTH_SHORT).show();
-		} else {
-			Toast.makeText(ctx, "Export failed - " + errMsg, Toast.LENGTH_SHORT).show();
+	protected void onPostExecute(final Boolean success) {
+		if (dialog != null) {
+			if (dialog.isShowing()) {
+				dialog.dismiss();
+			}
+			cb.hasFinished(success);
+			if (errMsg == null) {
+				Toast.makeText(ctx, "Export successful!", Toast.LENGTH_SHORT).show();
+			} else {
+				Toast.makeText(ctx, "Export failed - " + errMsg, Toast.LENGTH_SHORT).show();
+			}
 		}
 	}
 
