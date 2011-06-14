@@ -83,6 +83,10 @@ public class ExportDataTask extends AsyncTask<String, Void, Boolean> {
 				Log.e(DataXmlExporter.LOG_TAG, e.getMessage(), e);
 				errMsg = e.getMessage();
 				return false;
+			} finally {
+				if (db.isOpen()) {
+					db.close();
+				}
 			}
 		}
 		return true;

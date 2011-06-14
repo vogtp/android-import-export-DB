@@ -87,6 +87,7 @@ public abstract class DataExporter {
 		try {
 			channel.write(buff);
 		} finally {
+			Log.i(DataExporter.LOG_TAG, "Exported DB to " + file.toString());
 			if (channel != null)
 				channel.close();
 		}
