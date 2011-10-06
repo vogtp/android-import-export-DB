@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,21 +20,37 @@ public class DataJsonImporter {
 
 	private JSONObject jsonDb;
 
-	public DataJsonImporter(String DbName, File directory) {
+	public DataJsonImporter(String dbName, File directory) {
 		try {
-			jsonDb = (JSONObject) (new JSONObject(readFile(DbName, directory))).get(DbName);
-		} catch (JSONException e) {
-			Log.e(LOG_TAG, "Cannot parse as JSON", e);
-			jsonDb = new JSONObject();
+			File file = new File(directory, dbName + JsonConstants.FILE_NAME);
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			parseData(dbName, readFile(dbName, reader));
 		} catch (IOException e) {
 			Log.e(LOG_TAG, "Cannot read json DB file", e);
 			jsonDb = new JSONObject();
 		}
 	}
 
-	private String readFile(String dbName, File directory) throws IOException {
-		File file = new File(directory, dbName + JsonConstants.FILE_NAME);
-		BufferedReader reader = new BufferedReader(new FileReader(file));
+	public DataJsonImporter(String DbName, InputStream is) {
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+			parseData(DbName, readFile(DbName, reader));
+		} catch (IOException e) {
+			Log.e(LOG_TAG, "Cannot read json DB from InputStream", e);
+			jsonDb = new JSONObject();
+		}
+	}
+
+	private void parseData(String DbName, String payload) {
+		try {
+			jsonDb = (JSONObject) (new JSONObject(payload)).get(DbName);
+		} catch (JSONException e) {
+			Log.e(LOG_TAG, "Cannot parse as JSON", e);
+			jsonDb = new JSONObject();
+		}
+	}
+
+	private String readFile(String dbName, BufferedReader reader) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		String line;
 		while ((line = reader.readLine()) != null) {
