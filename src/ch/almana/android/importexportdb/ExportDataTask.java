@@ -14,6 +14,7 @@ import ch.almana.android.importexportdb.exporter.DataXmlExporter;
 
 public class ExportDataTask extends AsyncTask<String, Void, Boolean> {
 
+	private static final String LOG_TAG = "ExportDataTask";
 	private final Context ctx;
 	private final ProgressDialog dialog;
 	private final File directory;
@@ -96,14 +97,18 @@ public class ExportDataTask extends AsyncTask<String, Void, Boolean> {
 	@Override
 	protected void onPostExecute(final Boolean success) {
 		if (dialog != null) {
-			if (dialog.isShowing()) {
-				dialog.dismiss();
-			}
-			cb.hasFinished(success);
-			if (errMsg == null) {
-				Toast.makeText(ctx, "Export successful!", Toast.LENGTH_SHORT).show();
-			} else {
-				Toast.makeText(ctx, "Export failed - " + errMsg, Toast.LENGTH_SHORT).show();
+			try {
+				if (dialog.isShowing()) {
+					dialog.dismiss();
+				}
+				cb.hasFinished(success);
+				if (errMsg == null) {
+					Toast.makeText(ctx, "Export successful!", Toast.LENGTH_SHORT).show();
+				} else {
+					Toast.makeText(ctx, "Export failed - " + errMsg, Toast.LENGTH_SHORT).show();
+				}
+			} catch (Throwable e) {
+				Log.w(LOG_TAG, "Export callback not attachted anymore...", e);
 			}
 		}
 	}
