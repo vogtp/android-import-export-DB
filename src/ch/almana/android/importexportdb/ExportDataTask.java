@@ -54,8 +54,12 @@ public class ExportDataTask extends AsyncTask<String, Void, Boolean> {
 	@Override
 	protected void onPreExecute() {
 		if (dialog != null) {
+			try {
 			this.dialog.setMessage("Exporting database...");
 			this.dialog.show();
+			} catch (Throwable e) {
+				Log.i(DataExporter.LOG_TAG, "Where did our window go?", e);
+			}
 		}
 	}
 
