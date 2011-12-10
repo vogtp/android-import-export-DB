@@ -1,10 +1,7 @@
 package ch.almana.android.importexportdb;
 
-import java.io.File;
-
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -12,42 +9,31 @@ import ch.almana.android.importexportdb.exporter.DataExporter;
 import ch.almana.android.importexportdb.exporter.DataJsonExporter;
 import ch.almana.android.importexportdb.exporter.DataXmlExporter;
 
-public class ExportDataTask extends AsyncTask<String, Void, Boolean> {
+public class ExportDataTask extends AsyncTask<ExportConfig, Void, Boolean> {
 
 	private static final String LOG_TAG = "ExportDataTask";
 	private final Context ctx;
 	private final ProgressDialog dialog;
-	private final File directory;
-	private SQLiteDatabase db;
-	private ExportType exportType;
 	private Object errMsg;
 	private BackupRestoreCallback cb;
-
-	public enum ExportType {
-		JSON, XML;
-	}
 
 	// hide
 	@SuppressWarnings("unused")
 	private ExportDataTask() {
 		super();
 		this.ctx = null;
-		this.directory = null;
 		this.dialog = null;
 	}
 
-	public ExportDataTask(BackupRestoreCallback cb, SQLiteDatabase db, File saveDirectory, ExportType exportType) {
+	public ExportDataTask(BackupRestoreCallback cb) {
 		super();
 		this.cb = cb;
 		this.ctx = cb.getContext();
-		this.db = db;
-		this.directory = saveDirectory;
 		if (ctx == ctx.getApplicationContext()) {
 			this.dialog = null;
 		} else {
 			this.dialog = new ProgressDialog(ctx);
 		}
-		this.exportType = exportType;
 	}
 
 	// can use UI thread here
@@ -65,32 +51,31 @@ public class ExportDataTask extends AsyncTask<String, Void, Boolean> {
 
 	// automatically done on worker thread (separate from UI thread)
 	@Override
-	protected Boolean doInBackground(final String... args) {
-		DataExporter dm;
-		switch (exportType) {
-		case JSON:
-			dm = new DataJsonExporter(db, directory);
-			break;
-		case XML:
-			dm = new DataXmlExporter(db, directory);
-			break;
-
-		default:
-			dm = new DataJsonExporter(db, directory);
-			break;
-		}
+	protected Boolean doInBackground(final ExportConfig... args) {
 		for (int i = 0; i < args.length; i++) {
-
+			ExportConfig config = args[i];
+			DataExporter dm = null;
 			try {
-				String dbName = args[i];
-				dm.export(dbName);
+				switch (config.exportType) {
+				case JSON:
+					dm = new DataJsonExporter(config.db, config.directory);
+					break;
+				case XML:
+					dm = new DataXmlExporter(config.db, config.directory);
+					break;
+
+				default:
+					dm = new DataJsonExporter(config.db, config.directory);
+					break;
+				}
+				dm.export(config);
 			} catch (Exception e) {
 				Log.e(DataXmlExporter.LOG_TAG, e.getMessage(), e);
 				errMsg = e.getMessage();
 				return false;
 			} finally {
-				if (db.isOpen()) {
-					db.close();
+				if (dm != null) {
+					dm.closeDb();
 				}
 			}
 		}

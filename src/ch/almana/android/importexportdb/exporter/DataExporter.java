@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.text.TextUtils;
 import android.util.Log;
+import ch.almana.android.importexportdb.ExportConfig;
 import ch.almana.android.importexportdb.constants.JsonConstants;
 
 public abstract class DataExporter {
@@ -25,7 +26,11 @@ public abstract class DataExporter {
 		this.directory = directory;
 	}
 
-	public void export(String dbName) throws Exception {
+	public void export(ExportConfig config) throws Exception {
+		String dbName = config.getDatabaseName();
+		if (dbName == null) {
+			throw new IllegalArgumentException("ExportConfig.databaseName must not be null");
+		}
 		Log.i(LOG_TAG, "exporting database - " + dbName);
 
 		prepairExport(dbName);
@@ -39,7 +44,9 @@ public abstract class DataExporter {
 			Log.d(LOG_TAG, "table name " + tableName);
 
 			// skip metadata, sequence, and uidx (unique indexes)
-			if (!tableName.equals("android_metadata") && !tableName.equals("sqlite_sequence") && !tableName.startsWith("uidx") && !tableName.startsWith("idx_")) {
+			if (!tableName.equals("android_metadata") && !tableName.equals("sqlite_sequence")
+					&& !tableName.startsWith("uidx") && !tableName.startsWith("idx_")
+					&& !config.isExcludeTable(tableName)) {
 				try {
 					this.exportTable(tableName);
 				} catch (SQLiteException e) {
@@ -93,6 +100,12 @@ public abstract class DataExporter {
 		}
 	}
 
+	public void closeDb() {
+		if (db != null && db.isOpen()) {
+			db.close();
+		}
+	}
+
 	abstract protected String getExportAsString() throws Exception;
 
 	abstract protected void prepairExport(String dbName) throws Exception;
@@ -106,5 +119,6 @@ public abstract class DataExporter {
 	abstract protected void endTable() throws Exception;
 
 	abstract protected void startTable(String tableName) throws Exception;
+
 
 }
