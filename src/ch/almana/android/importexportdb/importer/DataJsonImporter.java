@@ -6,11 +6,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Iterator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.net.Uri;
 import android.util.Log;
 import ch.almana.android.importexportdb.constants.JsonConstants;
 
@@ -61,6 +65,23 @@ public class DataJsonImporter {
 
 	public JSONArray getTables(String tableName) throws JSONException {
 		return jsonDb.getJSONArray(tableName);
+	}
+
+	public void restoreTable(ContentResolver contentResolver, Uri contentUri, String tableName) throws JSONException {
+		JSONArray table = getTables(tableName);
+		Log.i(LOG_TAG, "Restoring table " + tableName);
+		for (int i = 0; i < table.length(); i++) {
+			Log.v(LOG_TAG, "Restoring table " + tableName + " row " + i);
+			ContentValues values = new ContentValues();
+			JSONObject rowJson = table.getJSONObject(i);
+			Iterator<String> keys = rowJson.keys();
+			while (keys.hasNext()) {
+				String key = keys.next();
+				values.put(key, rowJson.getString(key));
+			}
+			contentResolver.insert(contentUri, values);
+		}
+		Log.i(LOG_TAG, "Successfully restored table " + tableName);
 	}
 
 }
