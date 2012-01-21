@@ -2,6 +2,8 @@ package ch.almana.android.importexportdb.helper;
 
 public interface ProgressCallback {
 
+	public void SetProgressMessage(String msg);
+
 	public void setMaxProgress(int max);
 
 	public void setProgress(int p);

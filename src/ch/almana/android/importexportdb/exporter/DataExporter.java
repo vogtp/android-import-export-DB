@@ -69,6 +69,7 @@ public abstract class DataExporter {
 		String sql = "select * from " + tableName;
 		Cursor c = this.db.rawQuery(sql, new String[0]);
 		if (pcb != null) {
+			pcb.SetProgressMessage(tableName);
 			pcb.setMaxProgress(c.getCount());
 		}
 		int count = 1;

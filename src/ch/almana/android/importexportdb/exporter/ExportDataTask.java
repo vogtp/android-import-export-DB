@@ -16,7 +16,6 @@ public class ExportDataTask extends AsyncTask<ExportConfig, String, Boolean> imp
 	private final ProgressDialog dialog;
 	private Object errMsg;
 	private BackupRestoreCallback cb;
-	private int curTableCnt = 1;
 
 	// hide
 	@SuppressWarnings("unused")
@@ -122,7 +121,6 @@ public class ExportDataTask extends AsyncTask<ExportConfig, String, Boolean> imp
 	@Override
 	public void setMaxProgress(int max) {
 		if (dialog != null) {
-			publishProgress(new String[] { Integer.toString(curTableCnt++) });
 			dialog.setMax(max);
 		}
 	}
@@ -132,5 +130,10 @@ public class ExportDataTask extends AsyncTask<ExportConfig, String, Boolean> imp
 		if (dialog != null) {
 			dialog.setProgress(p);
 		}
+	}
+
+	@Override
+	public void SetProgressMessage(String msg) {
+		publishProgress(new String[] { msg });
 	}
 }

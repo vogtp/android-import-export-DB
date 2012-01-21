@@ -65,7 +65,7 @@ public class ImportDataTask extends AsyncTask<ImportConfig, String, Boolean> imp
 				int count = 1;
 				int max = config.tables.size();
 				for (String tableName : config.tables.keySet()) {
-					publishProgress(new String[] { count++ + "/" + max });
+					SetProgressMessage(tableName + " (" + count++ + "/" + max + ")");
 					ProgressCallback callback = dialog != null ? this : null;
 					dm.restoreTable(resolver, config.tables.get(tableName), tableName, callback);
 				}
@@ -123,5 +123,10 @@ public class ImportDataTask extends AsyncTask<ImportConfig, String, Boolean> imp
 		if (dialog != null) {
 			dialog.setProgress(p);
 		}
+	}
+
+	@Override
+	public void SetProgressMessage(String msg) {
+		publishProgress(new String[] { msg });
 	}
 }
