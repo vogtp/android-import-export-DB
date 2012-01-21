@@ -11,8 +11,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.text.TextUtils;
 import android.util.Log;
-import ch.almana.android.importexportdb.ExportConfig;
 import ch.almana.android.importexportdb.constants.JsonConstants;
+import ch.almana.android.importexportdb.helper.ProgressCallback;
 
 public abstract class DataExporter {
 
@@ -27,6 +27,10 @@ public abstract class DataExporter {
 	}
 
 	public void export(ExportConfig config) throws Exception {
+		export(config, null);
+	}
+
+	public void export(ExportConfig config, ProgressCallback pcb) throws Exception {
 		String dbName = config.getDatabaseName();
 		if (dbName == null) {
 			throw new IllegalArgumentException("ExportConfig.databaseName must not be null");
@@ -48,7 +52,7 @@ public abstract class DataExporter {
 					&& !tableName.startsWith("uidx") && !tableName.startsWith("idx_")
 					&& !config.isExcludeTable(tableName)) {
 				try {
-					this.exportTable(tableName);
+					this.exportTable(tableName, pcb);
 				} catch (SQLiteException e) {
 					Log.w(LOG_TAG, "Error exporting table " + tableName, e);
 				}
@@ -59,13 +63,20 @@ public abstract class DataExporter {
 		Log.i(LOG_TAG, "exporting database complete");
 	}
 
-	private void exportTable(final String tableName) throws Exception {
+	private void exportTable(final String tableName, ProgressCallback pcb) throws Exception {
 		Log.d(LOG_TAG, "exporting table - " + tableName);
 
 		String sql = "select * from " + tableName;
 		Cursor c = this.db.rawQuery(sql, new String[0]);
+		if (pcb != null) {
+			pcb.setMaxProgress(c.getCount());
+		}
+		int count = 1;
 		startTable(tableName);
 		while (c.moveToNext()) {
+			if (pcb != null) {
+				pcb.setProgress(count++);
+			}
 			startRow();
 			String id = c.getString(1);
 			if (id == null || TextUtils.isEmpty(id)) {

@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="hello">Hello World!</string>
     <string name="app_name">Backup DB to XML</string>
+    <string name="msg_import">Importing table</string>
+    <string name="msg_import_successful">Import successful!</string>
+    <string name="msg_import_failed">"Import failed - "</string>
+    <string name="msg_export_successful">Export successful!</string>
+    <string name="msg_export_failed">"Export failed - "</string>
+    <string name="msg_exporting_table">Exporting table</string>
+
 </resources>

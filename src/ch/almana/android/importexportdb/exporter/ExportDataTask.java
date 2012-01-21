@@ -1,21 +1,22 @@
-package ch.almana.android.importexportdb;
+package ch.almana.android.importexportdb.exporter;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
-import ch.almana.android.importexportdb.exporter.DataExporter;
-import ch.almana.android.importexportdb.exporter.DataJsonExporter;
-import ch.almana.android.importexportdb.exporter.DataXmlExporter;
+import ch.almana.android.importexportdb.BackupRestoreCallback;
+import ch.almana.android.importexportdb.R;
+import ch.almana.android.importexportdb.helper.ProgressCallback;
 
-public class ExportDataTask extends AsyncTask<ExportConfig, Void, Boolean> {
+public class ExportDataTask extends AsyncTask<ExportConfig, String, Boolean> implements ProgressCallback {
 
 	private static final String LOG_TAG = "ExportDataTask";
 	private final Context ctx;
 	private final ProgressDialog dialog;
 	private Object errMsg;
 	private BackupRestoreCallback cb;
+	private int curTableCnt = 1;
 
 	// hide
 	@SuppressWarnings("unused")
@@ -33,6 +34,7 @@ public class ExportDataTask extends AsyncTask<ExportConfig, Void, Boolean> {
 			this.dialog = null;
 		} else {
 			this.dialog = new ProgressDialog(ctx);
+			dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 		}
 	}
 
@@ -41,11 +43,20 @@ public class ExportDataTask extends AsyncTask<ExportConfig, Void, Boolean> {
 	protected void onPreExecute() {
 		if (dialog != null) {
 			try {
-			this.dialog.setMessage("Exporting database...");
+				this.dialog.setMessage(ctx.getString(R.string.msg_exporting_table));
 			this.dialog.show();
 			} catch (Throwable e) {
 				Log.i(DataExporter.LOG_TAG, "Where did our window go?", e);
 			}
+		}
+	}
+
+	@Override
+	protected void onProgressUpdate(String... values) {
+		if (dialog != null && values.length > 0 && values[0] != null) {
+			dialog.setMessage(ctx.getString(R.string.msg_exporting_table) + ": " + values[0]);
+		} else {
+			dialog.setMessage(ctx.getString(R.string.msg_exporting_table));
 		}
 	}
 
@@ -68,7 +79,8 @@ public class ExportDataTask extends AsyncTask<ExportConfig, Void, Boolean> {
 					dm = new DataJsonExporter(config.db, config.directory);
 					break;
 				}
-				dm.export(config);
+				ProgressCallback callback = dialog != null ? this : null;
+				dm.export(config, callback);
 			} catch (Exception e) {
 				Log.e(DataXmlExporter.LOG_TAG, e.getMessage(), e);
 				errMsg = e.getMessage();
@@ -92,9 +104,9 @@ public class ExportDataTask extends AsyncTask<ExportConfig, Void, Boolean> {
 				}
 				cb.hasFinished(success);
 				if (errMsg == null) {
-					Toast.makeText(ctx, "Export successful!", Toast.LENGTH_SHORT).show();
+					Toast.makeText(ctx, R.string.msg_export_successful, Toast.LENGTH_SHORT).show();
 				} else {
-					Toast.makeText(ctx, "Export failed - " + errMsg, Toast.LENGTH_SHORT).show();
+					Toast.makeText(ctx, ctx.getString(R.string.msg_export_failed) + errMsg, Toast.LENGTH_SHORT).show();
 				}
 			} catch (Throwable e) {
 				Log.w(LOG_TAG, "Export callback not attachted anymore...", e);
@@ -102,7 +114,23 @@ public class ExportDataTask extends AsyncTask<ExportConfig, Void, Boolean> {
 		}
 	}
 
+
 	public ProgressDialog getDialog() {
 		return dialog;
+	}
+
+	@Override
+	public void setMaxProgress(int max) {
+		if (dialog != null) {
+			publishProgress(new String[] { Integer.toString(curTableCnt++) });
+			dialog.setMax(max);
+		}
+	}
+
+	@Override
+	public void setProgress(int p) {
+		if (dialog != null) {
+			dialog.setProgress(p);
+		}
 	}
 }

@@ -17,6 +17,7 @@ import android.content.ContentValues;
 import android.net.Uri;
 import android.util.Log;
 import ch.almana.android.importexportdb.constants.JsonConstants;
+import ch.almana.android.importexportdb.helper.ProgressCallback;
 
 public class DataJsonImporter {
 
@@ -68,10 +69,20 @@ public class DataJsonImporter {
 	}
 
 	public void restoreTable(ContentResolver contentResolver, Uri contentUri, String tableName) throws JSONException {
+		restoreTable(contentResolver, contentUri, tableName, null);
+	}
+
+	public void restoreTable(ContentResolver contentResolver, Uri contentUri, String tableName, ProgressCallback pcb) throws JSONException {
 		JSONArray table = getTables(tableName);
 		Log.i(LOG_TAG, "Restoring table " + tableName);
+		if (pcb != null) {
+			pcb.setMaxProgress(table.length());
+		}
 		for (int i = 0; i < table.length(); i++) {
 			Log.v(LOG_TAG, "Restoring table " + tableName + " row " + i);
+			if (pcb != null) {
+				pcb.setProgress(i);
+			}
 			ContentValues values = new ContentValues();
 			JSONObject rowJson = table.getJSONObject(i);
 			Iterator<String> keys = rowJson.keys();
