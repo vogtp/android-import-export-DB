@@ -49,7 +49,7 @@ public abstract class DataExporter {
 
 			// skip metadata, sequence, and uidx (unique indexes)
 			if (!tableName.equals("android_metadata") && !tableName.equals("sqlite_sequence")
-					&& !tableName.startsWith("uidx") && !tableName.startsWith("idx_")
+					&& !tableName.startsWith("uidx") && !tableName.startsWith("idx_") && !tableName.startsWith("_idx")
 					&& !config.isExcludeTable(tableName)) {
 				try {
 					this.exportTable(tableName, pcb);
