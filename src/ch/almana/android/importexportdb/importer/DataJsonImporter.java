@@ -90,7 +90,11 @@ public class DataJsonImporter {
 				String key = keys.next();
 				values.put(key, rowJson.getString(key));
 			}
-			contentResolver.insert(contentUri, values);
+			try {
+				contentResolver.insert(contentUri, values);
+			} catch (Throwable e) {
+				Log.w(LOG_TAG, "Error restoring row from table " + tableName, e);
+			}
 		}
 		Log.i(LOG_TAG, "Successfully restored table " + tableName);
 	}
