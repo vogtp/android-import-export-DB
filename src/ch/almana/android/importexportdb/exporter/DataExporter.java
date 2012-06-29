@@ -114,7 +114,10 @@ public abstract class DataExporter {
 
 	public void closeDb() {
 		if (db != null && db.isOpen()) {
-			db.close();
+			try {
+				db.close();
+			} catch (Throwable e) {
+			}
 		}
 	}
 
