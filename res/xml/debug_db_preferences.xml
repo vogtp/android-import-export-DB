@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="Database" >
+
+    <PreferenceScreen android:title="Database" >
+        <PreferenceCategory android:title="Database" >
+            <Preference
+                android:key="prefKeyShowDB"
+                android:title="Browse DB" />
+        </PreferenceCategory>
+    </PreferenceScreen>
+
+</PreferenceScreen>
