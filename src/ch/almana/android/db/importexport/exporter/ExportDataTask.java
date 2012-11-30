@@ -5,9 +5,9 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
+import ch.almana.android.db.R;
 import ch.almana.android.db.importexport.BackupRestoreCallback;
 import ch.almana.android.db.importexport.helper.ProgressCallback;
-import ch.almana.android.importexportdb.R;
 
 public class ExportDataTask extends AsyncTask<ExportConfig, String, Boolean> implements ProgressCallback {
 
