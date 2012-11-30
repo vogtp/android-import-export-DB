@@ -1,4 +1,4 @@
-package ch.almana.android.importexportdb.helper;
+package ch.almana.android.db.importexport.helper;
 
 public interface ProgressCallback {
 

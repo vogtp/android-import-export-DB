@@ -1,4 +1,4 @@
-package ch.almana.android.importexportdb.importer;
+package ch.almana.android.db.importexport.importer;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,8 +16,8 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.net.Uri;
 import android.util.Log;
-import ch.almana.android.importexportdb.constants.JsonConstants;
-import ch.almana.android.importexportdb.helper.ProgressCallback;
+import ch.almana.android.db.importexport.constants.JsonConstants;
+import ch.almana.android.db.importexport.helper.ProgressCallback;
 
 public class DataJsonImporter {
 

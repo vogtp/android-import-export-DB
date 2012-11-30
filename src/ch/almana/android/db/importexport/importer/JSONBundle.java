@@ -1,4 +1,4 @@
-package ch.almana.android.importexportdb.importer;
+package ch.almana.android.db.importexport.importer;
 
 import org.json.JSONException;
 import org.json.JSONObject;

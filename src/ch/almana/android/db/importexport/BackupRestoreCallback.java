@@ -1,4 +1,4 @@
-package ch.almana.android.importexportdb;
+package ch.almana.android.db.importexport;
 
 import android.content.Context;
 

@@ -1,4 +1,4 @@
-package ch.almana.android.importexportdb.importer;
+package ch.almana.android.db.importexport.importer;
 
 import java.io.File;
 import java.util.HashMap;

@@ -1,18 +1,15 @@
-package ch.almana.android.importexportdb.importer;
+package ch.almana.android.db.importexport.exporter;
 
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
-import ch.almana.android.importexportdb.BackupRestoreCallback;
+import ch.almana.android.db.importexport.BackupRestoreCallback;
+import ch.almana.android.db.importexport.helper.ProgressCallback;
 import ch.almana.android.importexportdb.R;
-import ch.almana.android.importexportdb.exporter.DataExporter;
-import ch.almana.android.importexportdb.exporter.DataXmlExporter;
-import ch.almana.android.importexportdb.helper.ProgressCallback;
 
-public class ImportDataTask extends AsyncTask<ImportConfig, String, Boolean> implements ProgressCallback {
+public class ExportDataTask extends AsyncTask<ExportConfig, String, Boolean> implements ProgressCallback {
 
 	private static final String LOG_TAG = "ExportDataTask";
 	private final Context ctx;
@@ -22,13 +19,13 @@ public class ImportDataTask extends AsyncTask<ImportConfig, String, Boolean> imp
 
 	// hide
 	@SuppressWarnings("unused")
-	private ImportDataTask() {
+	private ExportDataTask() {
 		super();
 		this.ctx = null;
 		this.dialog = null;
 	}
 
-	public ImportDataTask(BackupRestoreCallback cb) {
+	public ExportDataTask(BackupRestoreCallback cb) {
 		super();
 		this.cb = cb;
 		this.ctx = cb.getContext();
@@ -45,7 +42,7 @@ public class ImportDataTask extends AsyncTask<ImportConfig, String, Boolean> imp
 	protected void onPreExecute() {
 		if (dialog != null) {
 			try {
-				this.dialog.setMessage(ctx.getString(R.string.msg_import));
+				this.dialog.setMessage(ctx.getString(R.string.msg_exporting_table));
 			this.dialog.show();
 			} catch (Throwable e) {
 				Log.i(DataExporter.LOG_TAG, "Where did our window go?", e);
@@ -53,26 +50,44 @@ public class ImportDataTask extends AsyncTask<ImportConfig, String, Boolean> imp
 		}
 	}
 
+	@Override
+	protected void onProgressUpdate(String... values) {
+		if (dialog != null && values.length > 0 && values[0] != null) {
+			dialog.setMessage(ctx.getString(R.string.msg_exporting_table) + ": " + values[0]);
+		} else {
+			dialog.setMessage(ctx.getString(R.string.msg_exporting_table));
+		}
+	}
+
 	// automatically done on worker thread (separate from UI thread)
 	@Override
-	protected Boolean doInBackground(final ImportConfig... args) {
-		ContentResolver resolver = cb.getContext().getContentResolver();
+	protected Boolean doInBackground(final ExportConfig... args) {
 		for (int i = 0; i < args.length; i++) {
-			ImportConfig config = args[i];
-			DataJsonImporter dm = null;
+			ExportConfig config = args[i];
+			DataExporter dm = null;
 			try {
-				dm = new DataJsonImporter(config.getDatabaseName(), config.directory);
-				int count = 1;
-				int max = config.tables.size();
-				for (String tableName : config.tables.keySet()) {
-					SetProgressMessage(tableName + " (" + count++ + "/" + max + ")");
-					ProgressCallback callback = dialog != null ? this : null;
-					dm.restoreTable(resolver, config.tables.get(tableName), tableName, callback);
+				switch (config.exportType) {
+				case JSON:
+					dm = new DataJsonExporter(config.db, config.directory);
+					break;
+				case XML:
+					dm = new DataXmlExporter(config.db, config.directory);
+					break;
+
+				default:
+					dm = new DataJsonExporter(config.db, config.directory);
+					break;
 				}
+				ProgressCallback callback = dialog != null ? this : null;
+				dm.export(config, callback);
 			} catch (Exception e) {
 				Log.e(DataXmlExporter.LOG_TAG, e.getMessage(), e);
 				errMsg = e.getMessage();
 				return false;
+			} finally {
+				if (dm != null) {
+					dm.closeDb();
+				}
 			}
 		}
 		return true;
@@ -88,27 +103,19 @@ public class ImportDataTask extends AsyncTask<ImportConfig, String, Boolean> imp
 				}
 				cb.hasFinished(success);
 				if (errMsg == null) {
-					Toast.makeText(ctx, R.string.msg_import_successful, Toast.LENGTH_SHORT).show();
+					Toast.makeText(ctx, R.string.msg_export_successful, Toast.LENGTH_SHORT).show();
 				} else {
-					Toast.makeText(ctx, ctx.getString(R.string.msg_import_failed) + errMsg, Toast.LENGTH_SHORT).show();
+					Toast.makeText(ctx, ctx.getString(R.string.msg_export_failed) + errMsg, Toast.LENGTH_SHORT).show();
 				}
 			} catch (Throwable e) {
-				Log.w(LOG_TAG, "Import callback not attachted anymore...", e);
+				Log.w(LOG_TAG, "Export callback not attachted anymore...", e);
 			}
 		}
 	}
 
+
 	public ProgressDialog getDialog() {
 		return dialog;
-	}
-
-	@Override
-	protected void onProgressUpdate(String... values) {
-		if (dialog != null && values.length > 0 && values[0] != null) {
-			dialog.setMessage(ctx.getString(R.string.msg_import) + ": " + values[0]);
-		} else {
-			dialog.setMessage(ctx.getString(R.string.msg_import));
-		}
 	}
 
 	@Override
